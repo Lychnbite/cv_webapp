@@ -4,6 +4,21 @@ import pdfkit
 from django.http import HttpResponse
 from django.template import loader
 import io 
+from django.views import generic
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+
+class SignupView(generic.CreateView):
+    template_name = "registration/signup.html"
+    form_class = UserCreationForm
+
+
+    def get_success_url(self):
+        return reverse("login")
+
+
+
 
 
 def accept(request):
@@ -33,7 +48,7 @@ def accept(request):
     return render(request,"pdf/accept.html")
 
 
-
+@login_required(login_url="login")
 def resume(request,id):
     user_profile = Profile.objects.get(pk=id)
     template = loader.get_template("pdf/resume.html")
@@ -50,7 +65,7 @@ def resume(request,id):
 
     return response
 
-
+@login_required(login_url="login")
 def list(request):
     profiles = Profile.objects.all()
     return render(request, "pdf/list.html",{"profiles":profiles})
